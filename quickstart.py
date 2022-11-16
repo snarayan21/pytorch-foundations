@@ -16,7 +16,7 @@ batch_size = 64
 train_dataloader = DataLoader(training_data, batch_size=batch_size)
 test_dataloader = DataLoader(test_data, batch_size=batch_size)
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
+device = "mps" if torch.backends.mps.is_available() else "cpu"
 print("Using device", device)
 
 
@@ -58,6 +58,7 @@ n_epochs = 10
 for i in range(n_epochs):
     epoch_loss = 0
     for inputs, labels in train_dataloader:
+        inputs, labels = inputs.to(device), labels.to(device)
         optimizer.zero_grad()
         out = model(inputs)
         loss = criterion(out, labels)
@@ -68,10 +69,10 @@ for i in range(n_epochs):
 
 test_batch, label = next(iter(test_dataloader))
 
-img = test_batch[0]
+img = test_batch[0].to(device)
 
 with torch.no_grad():
-    print(model(torch.unsqueeze(img, 0)))
+    print(torch.model(torch.unsqueeze(img, 0)))
     print("true label:", label[0])
-    plt.imshow(img.numpy().squeeze(), cmap="gray_r")
+    plt.imshow(img.cpu().numpy().squeeze(), cmap="gray_r")
     plt.show()
